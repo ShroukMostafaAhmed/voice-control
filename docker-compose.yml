@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # محرك الذكاء الاصطناعي (إيما)
+  ai_v2:
+    build: ./ai_system
+    container_name: ai_engine_v2
+    ports:
+      - "5002:5000"
+    volumes:
+      - ./ai_system:/app
+    environment:
+      - BACKEND_URL=http://backend_v2:8080
+    networks:
+      - smarthome_net
+
+  # الباكيند النسخة المطورة (FastAPI)
+  backend_v2:
+    build: ./backend
+    container_name: backend_v2
+    ports:
+      - "8002:8080" # ربط بورت المضيف 8002 ببورت الحاوية 8080 اللي شغال عليه الكود
+    volumes:
+      - ./database:/app/database:rw
+    environment:
+      - DATABASE_URL=/app/database/smart_home.db
+      - MQTT_BROKER=broker.emqx.io # أو البروكر اللي بتستخدمه
+    networks:
+      - smarthome_net
+    depends_on:
+      - ai_v2
+
+  # الواجهة الأمامية (Nginx)
+  frontend_v2:
+    image: nginx:alpine
+    container_name: frontend_v2_web
+    ports:
+      - "3002:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    networks:
+      - smarthome_net
+
+networks:
+  smarthome_net:
+    driver: bridge

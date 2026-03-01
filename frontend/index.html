@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Emma - Smart Home Control</title>
+    <link rel="stylesheet" href="style.css?v=2.0">
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <h1>Emma - Smart Home Control</h1>
+            </div>
+            <div class="header-info">
+                <span id="current-time"></span>
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span>System Active</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Top Navigation Tabs -->
+            <div class="top-tabs">
+                <button class="tab-btn active" data-view="control">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Control Panel
+                </button>
+                <button class="tab-btn" data-view="simulation">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    3D Simulation
+                </button>
+                <button class="tab-btn" data-view="ai">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 16v-4"></path>
+                        <path d="M12 8h.01"></path>
+                    </svg>
+                    AI Control
+                </button>
+            </div>
+
+            <!-- Control Panel View -->
+            <div id="control-view" class="view-container active">
+                <aside class="sidebar">
+                    <nav>
+                        <button class="nav-btn active" data-room="all">
+                            <span class="nav-icon"></span> All Rooms
+                        </button>
+                        <button class="nav-btn" data-room="bathroom">
+                            <span class="nav-icon"></span> Bathroom
+                        </button>
+                        <button class="nav-btn" data-room="corridors">
+                            <span class="nav-icon"></span> Corridors - Eyes
+                        </button>
+                        <button class="nav-btn" data-room="reception">
+                            <span class="nav-icon"></span> Reception
+                        </button>
+                        <button class="nav-btn" data-room="outdoor">
+                            <span class="nav-icon"></span> Out Door
+                        </button>
+                        <button class="nav-btn" data-room="room1">
+                            <span class="nav-icon"></span> Room 1
+                        </button>
+                        <button class="nav-btn" data-room="kitchen">
+                            <span class="nav-icon"></span> Kitchen
+                        </button>
+                        <button class="nav-btn" data-room="room2">
+                            <span class="nav-icon"></span> Room 2
+                        </button>
+                    </nav>
+                </aside>
+
+                <main class="dashboard">
+                    <div class="rooms-grid" id="rooms-container"></div>
+                </main>
+
+                <aside class="right-panel">
+                    <div class="panel-section">
+                        <h3>Alerts</h3>
+                        <div id="alerts-container" class="alerts-list"></div>
+                    </div>
+
+                    <div class="panel-section">
+                        <h3>Emma Suggestions</h3>
+                        <div id="ai-suggestions" class="suggestions-list"></div>
+                    </div>
+
+                    <div class="panel-section">
+                        <h3>System Stats</h3>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Active Devices</span>
+                                <span class="stat-value" id="active-devices">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Energy Usage</span>
+                                <span class="stat-value" id="energy-usage">0 kW</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- 3D Simulation View -->
+            <div id="simulation-view" class="view-container">
+                <div class="simulation-wrapper">
+                    <!-- Voice Control Button -->
+                    <div class="simulation-voice-control">
+                        <button id="voice-control-btn" class="simulation-voice-btn" title="Voice Control - Say Hey Emma">
+                            MIC
+                        </button>
+                        <div id="voice-indicator" class="voice-indicator" style="display: none; margin-top: 10px;">
+                            🔇 Disabled
+                        </div>
+                    </div>
+                    
+                    <div class="apartment-3d" id="apartment-3d"></div>
+                    <div class="sensors-panel">
+                        <h3>Live Sensors Data</h3>
+                        <div class="sensors-grid" id="sensors-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Control View -->
+            <div id="ai-view" class="view-container">
+                <div class="ai-wrapper">
+                    <div class="ai-chat-container">
+                        <div class="ai-header">
+                            <h2>Emma AI Assistant</h2>
+                            <div class="ai-status">
+                                <span class="ai-dot"></span>
+                                <span>Online</span>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-chat-messages" id="ai-chat-messages">
+                            <div class="ai-message ai-message-assistant">
+                                <div class="ai-avatar">Emma</div>
+                                <div class="ai-message-content">
+                                    <p>Hello! I'm Emma, your smart home AI assistant. You can ask me to control devices like:</p>
+                                    <ul>
+                                        <li>"Turn on reception light"</li>
+                                        <li>"Turn off kitchen fan"</li>
+                                        <li>"Open bedroom window"</li>
+                                    </ul>
+                                    <p style="margin-top: 10px; opacity: 0.8;">Or just say <strong>"Hey Emma"</strong> to use voice control!</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-input-container">
+                            <input type="text" id="ai-command-input" placeholder="Type your command or say Hey Emma..." />
+                            <button id="ai-send-btn" class="ai-send-btn">Send</button>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-dashboard">
+                        <div class="ai-panel">
+                            <h3>Voice Control</h3>
+                            <div id="voice-status" class="voice-status">🔇 Disabled</div>
+                            <button id="voice-toggle-btn" class="voice-toggle-btn">Enable Voice Control</button>
+                            <div class="voice-instructions">
+                                Say <strong>"Hey Emma"</strong> to wake her up, then speak your command within 7 seconds.
+                                Emma will respond with voice.
+                            </div>
+                            <div id="voice-commands-log" class="voice-commands-log" style="margin-top: 15px;">
+                                <div style="opacity: 0.6; text-align: center;">No voice commands yet</div>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-panel">
+                            <h3>Environment</h3>
+                            <div id="ai-environment" class="ai-env-grid"></div>
+                        </div>
+                        
+                        <div class="ai-panel">
+                            <h3>Emma Suggestions</h3>
+                            <div id="ai-suggestions-list" class="ai-suggestions"></div>
+                        </div>
+                        
+                        <div class="ai-panel">
+                            <h3>AI Statistics</h3>
+                            <div id="ai-stats" class="ai-stats-grid"></div>
+                        </div>
+                        
+                        <div class="ai-panel">
+                            <h3>Auto Control Mode</h3>
+                            <p style="font-size: 0.9em; opacity: 0.7; margin-bottom: 10px;">
+                                Let Emma automatically control your home based on environment conditions
+                            </p>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <button id="ai-auto-mode-toggle" class="ai-action-btn" style="flex: 1; position: relative; padding: 15px;">
+                                    <span id="auto-mode-status" style="font-weight: bold; font-size: 1.1em;">OFF</span>
+                                </button>
+                                <div id="auto-mode-indicator" style="width: 20px; height: 20px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); transition: all 0.3s;"></div>
+                            </div>
+                            <div id="auto-mode-log" style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; max-height: 150px; overflow-y: auto; font-size: 0.85em; font-family: monospace;">
+                                <div style="opacity: 0.6;">Auto mode is OFF. Click button to enable.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-panel">
+                            <h3>Manual Actions</h3>
+                            <button id="ai-auto-execute" class="ai-action-btn">Execute AI Decisions Once</button>
+                            <button id="ai-analyze" class="ai-action-btn secondary">Analyze Environment</button>
+                        </div>
+                        
+                        <div class="ai-panel">
+                            <h3>🎬 Test Scenarios</h3>
+                            <p style="font-size: 0.9em; opacity: 0.7; margin-bottom: 10px;">
+                                Simulate different situations and see how Emma responds
+                            </p>
+                            <div class="scenarios-grid">
+                                <button class="scenario-btn fire" data-scenario="fire">
+                                    🔥 Fire Emergency
+                                </button>
+                                <button class="scenario-btn hot" data-scenario="hot">
+                                    ☀️ Hot Weather
+                                </button>
+                                <button class="scenario-btn cold" data-scenario="cold">
+                                    ❄️ Cold Weather
+                                </button>
+                                <button class="scenario-btn night" data-scenario="night">
+                                    🌙 Night Mode
+                                </button>
+                                <button class="scenario-btn morning" data-scenario="morning">
+                                    🌅 Morning Routine
+                                </button>
+                                <button class="scenario-btn away" data-scenario="away">
+                                    🚪 Leaving Home
+                                </button>
+                            </div>
+                            <button id="clear-fire-btn" class="scenario-btn" style="background: linear-gradient(135deg, #10b981, #059669); width: 100%; margin-top: 10px; display: none;">
+                                ✅ Clear Fire Emergency
+                            </button>
+                            <div id="scenario-response" class="scenario-response"></div>
+                        </div>
+                        
+                        <div class="ai-panel">
+                            <h3>Chatbot Settings</h3>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" id="use-mistral-toggle" checked style="width: 20px; height: 20px;">
+                                <span>Use Mistral AI (if available)</span>
+                            </label>
+                            <p style="font-size: 0.85em; opacity: 0.6; margin-top: 5px;">
+                                Unchecked = Use simple rule-based parser
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="api.js?v=2.4"></script>
+    <script src="ai_client.js?v=2.4"></script>
+    <script src="voice_control.js?v=2.4"></script>
+    <script src="device_sounds.js?v=2.4"></script>
+    <script src="scenarios.js?v=2.4"></script>
+    <script src="data.js?v=2.4"></script>
+    <script src="background.js?v=2.4"></script>
+    <script src="simulation.js?v=2.4"></script>
+    <script src="apartment3d.js?v=2.4"></script>
+    <script src="app.js?v=2.4"></script>
+</body>
+</html>

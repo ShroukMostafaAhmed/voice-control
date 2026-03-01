@@ -1,0 +1,5 @@
+﻿smart_home_model.pkl
+venv/
+*.db
+*.log
+__pycache__/
